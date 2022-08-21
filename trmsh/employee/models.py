@@ -2,6 +2,9 @@ from django.db import models
 from django.db.models import SET_NULL, PROTECT
 from django.urls import reverse
 
+import employee.models
+
+
 class Skills(models.Model):
     LEVEL = (
         ("Отлично", "Отлично"),
@@ -32,10 +35,10 @@ class Branches(models.Model):
 
 class Personal(models.Model):
     PCYCHO = (
-        ("Отлично", "Отлично"),
-        ("Хорошо", "Хорошо"),
-        ("Удовлетворительно", "Удовлетворительно"),
-        ("Неудовлетворительно", "Неудовлетворительно")
+        (1, "Высокий уровень"),
+        (2, "Средний уровень"),
+        (3, "Низкий уровень"),
+
     )
     responsibility = models.CharField(choices=PCYCHO, null=True, blank=True, max_length=20, verbose_name="Ответственность")
     sociability = models.CharField(choices=PCYCHO, null=True, blank=True, max_length=20, verbose_name="Коммуникабельность")
@@ -65,10 +68,12 @@ class Employee(models.Model):
     cat = models.CharField(choices=LEVEL_CATEGORY, max_length=10, null=True, verbose_name='Категория')
     explored_branches = models.ForeignKey(Branches, on_delete=models.PROTECT, null=True, verbose_name='Знакомые объекты')  # Выбираются все шахты, на которых сотрудник работал 2 недели и более
     favorite_branch = models.ForeignKey(Branches, related_name='favoritebranches', on_delete=models.PROTECT, null=True, verbose_name='Предпочитаемый объект')  # Выбирается одна шахта
-    skills_level = models.ForeignKey(Skills, verbose_name='Уровень навыков', on_delete=models.PROTECT, null=True)
+    skills_level = models.ManyToManyField(Skills, verbose_name='Уровень навыков', null=True)
     personal_qualities = models.ForeignKey(Personal, on_delete=models.PROTECT, null=True, verbose_name='Личные качества')
     medical = models.TextField(blank=False, verbose_name='Мединформация', null=True)
     special = models.TextField(blank=False, verbose_name='Особые отметки', null=True)
+
+
 
     class Meta:
         verbose_name = 'Сотрудники'
